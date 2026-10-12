@@ -3,6 +3,7 @@ package vn.edu.vhu.ltdd.a7permission;
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -230,14 +231,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void guiThongBao() {
+
+        Intent intent = new Intent(this, MainActivity.class);
+
+        intent.setFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK |
+                Intent.FLAG_ACTIVITY_CLEAR_TOP
+        );
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                this,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT |
+                PendingIntent.FLAG_IMMUTABLE
+        );
+
         NotificationCompat.Builder b = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(android.R.drawable.ic_dialog_info)
                 .setContentTitle(getString(R.string.noti_title))
                 .setContentText(getString(R.string.noti_text))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
         try {
             NotificationManagerCompat.from(this).notify(NOTI_ID, b.build());
+            Log.d(TAG, "Đã gửi thông bao có PendingIntent");
         } catch (SecurityException e) {
             // Người dùng vừa tắt quyền ở Cài đặt trong lúc app đang chạy
             Log.w(TAG, "Thiếu quyền gửi thông báo", e);
