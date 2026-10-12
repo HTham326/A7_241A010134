@@ -28,6 +28,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.util.Map;
+
 public class MainActivity extends AppCompatActivity {
 
     // TODO: thay 2201234567 bằng MSSV của bạn
@@ -38,6 +40,25 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageView imgAnh;
     private TextView tvTrangThai, tvAnh;
+
+    //Xin đồng thời hai quyền CAMERA và POST_NOTIFICATIONS
+    private final ActivityResultLauncher<String[]> xinNhieuQuyen = registerForActivityResult(
+             new ActivityResultContracts.RequestMultiplePermissions(),
+            ketQua -> {
+                 Boolean camera = ketQua.get(Manifest.permission.CAMERA);
+                 Boolean thongBao = ketQua.get(Manifest.permission.POST_NOTIFICATIONS);
+
+                 if(camera != null) {
+                     Log.d(TAG, "NC1 - CAMERA" + camera);
+                 }
+
+                 if(thongBao != null) {
+                     Log.d(TAG, "NC1 - POST_NOTIFICATIONS" + thongBao);
+                 }
+
+                 capNhatTrangThai();
+                }
+            );
 
     // ---------------------------------------------------------------
     // 1) Bộ xin quyền CAMERA.
@@ -104,12 +125,14 @@ public class MainActivity extends AppCompatActivity {
         Button btnChupAnh = findViewById(R.id.btnChupAnh);
         Button btnThongBao = findViewById(R.id.btnThongBao);
         Button btnCaiDat = findViewById(R.id.btnCaiDat);
+        Button btnNhieuQuyen = findViewById(R.id.btnNhieuQuyen);
 
         taoKenhThongBao();
 
         btnChupAnh.setOnClickListener(v -> kiemTraRoiChup());
         btnThongBao.setOnClickListener(v -> kiemTraRoiGuiThongBao());
         btnCaiDat.setOnClickListener(v -> moCaiDatUngDung());
+        btnNhieuQuyen.setOnClickListener(v -> kiemTraNhieuQuyen());
     }
 
     @Override
@@ -179,6 +202,19 @@ public class MainActivity extends AppCompatActivity {
             guiThongBao();
         } else {
             xinQuyenThongBao.launch(Manifest.permission.POST_NOTIFICATIONS);
+        }
+    }
+
+    private  void kiemTraNhieuQuyen() {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            xinNhieuQuyen.launch(new String[] {
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.POST_NOTIFICATIONS
+            });
+        } else {
+            xinNhieuQuyen.launch(new String[] {
+                    Manifest.permission.CAMERA
+            });
         }
     }
 
